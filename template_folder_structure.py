@@ -34,7 +34,10 @@ list_of_files = [
     "main.py",
     "setup.py",
     "research/trials.ipynb",
-    "templates/index.html"
+    "templates/index.html",
+    ".dockerignore", 
+    ".env.example", 
+    ".gitignore", 
 
 
 ]
