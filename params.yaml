@@ -1,4 +1,6 @@
-train:
-  batch_size: 32
-  learning_rate: 0.001
-  epochs: 10
+AUGMENTATION: True
+IMAGE_SIZE: [640, 640, 3] 
+BATCH_SIZE: 16
+EPOCHS: 1
+CLASSES: 1
+LEARNING_RATE: 0.01

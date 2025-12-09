@@ -27,14 +27,26 @@ def read_yaml(path_to_yaml: Path) -> ConfigBox:
         ConfigBox: ConfigBox type
     """
     try:
-        with open(path_to_yaml) as yaml_file:
+        path = Path(path_to_yaml)
+        if not path.exists():
+            raise FileNotFoundError(f"YAML file does not exist: {path}")
+
+        with open(path, "r", encoding="utf-8") as yaml_file:
             content = yaml.safe_load(yaml_file)
-            log.info(f"yaml file: {path_to_yaml} loaded successfully")
-            return ConfigBox(content)
+
+        if content is None:
+            raise ValueError(f"YAML file is empty: {path}")
+
+        if not isinstance(content, dict):
+            raise ValueError(f"Invalid YAML format in {path}: expected a mapping at the root")
+
+        log.info(f"yaml file: {path} loaded successfully")
+        return ConfigBox(content)
     except BoxValueError:
-        raise ValueError("yaml file is empty")
-    except Exception as e:
-        raise e
+        raise ValueError("yaml file is empty or malformed")
+    except Exception:
+        # re-raise with original traceback
+        raise
     
 
 

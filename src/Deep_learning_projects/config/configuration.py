@@ -1,4 +1,5 @@
-from Deep_learning_projects.entity.config_entity import DataIngestionConfig
+from Deep_learning_projects.entity.config_entity import (DataIngestionConfig,
+                                                         PrepareBaseModelConfig)
 from pathlib import Path
 import os
 from Deep_learning_projects.utils.common import read_yaml, create_directories,save_json
@@ -31,3 +32,20 @@ class ConfigurationManager:
         )
 
         return data_ingestion_config
+    
+    def get_prepare_base_model_config(self) -> PrepareBaseModelConfig:
+        config = self.config.prepare_base_model
+        
+        create_directories([config.root_dir])
+
+        prepare_base_model_config = PrepareBaseModelConfig(
+            root_dir=config.root_dir,
+            base_model_path=config.base_model_path,
+            updated_base_model_path=config.updated_base_model_path,
+            params_image_size=self.params.IMAGE_SIZE,
+            params_learning_rate=self.params.LEARNING_RATE,
+            params_classes=self.params.CLASSES,
+            model_name=config.model_name
+        )
+
+        return prepare_base_model_config
