@@ -1,10 +1,11 @@
 from dataclasses import dataclass
-import os
+from typing import Optional
 from pathlib import Path
 
-@dataclass
+
+@dataclass(frozen=True)
 class DataIngestionConfig:
-    src_url: str
     root_dir: Path
-    zip_dir: Path
-    data_dir: Path
+    source_URL: str
+    local_data_file: Path
+    unzip_dir: Path
