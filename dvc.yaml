@@ -1,0 +1,53 @@
+stages:
+  data_ingestion:
+    cmd: python src/Deep_learning_projects/pipeline/stage01_data_ingestion_pipeline.py
+    deps:
+      - src/Deep_learning_projects/pipeline/stage01_data_ingestion_pipeline.py
+      - config/config.yaml
+    outs:
+      - artifacts/data_ingestion
+
+  prepare_base_model:
+    cmd: python src/Deep_learning_projects/pipeline/stage02_prepare_base_model.py
+    deps:
+      - src/Deep_learning_projects/pipeline/stage02_prepare_base_model.py
+      - config/config.yaml
+      - params.yaml
+    params:
+      - IMAGE_SIZE
+      - CLASSES
+    outs:
+      - artifacts/prepare_base_model
+
+  training:
+    cmd: python src/Deep_learning_projects/pipeline/stage03_model_training_pipeline.py
+    deps:
+      - src/Deep_learning_projects/pipeline/stage03_model_training_pipeline.py
+      - src/Deep_learning_projects/components/model_training.py
+      - config/config.yaml
+      - artifacts/data_ingestion
+      - artifacts/prepare_base_model
+    params:
+      - EPOCHS
+      - BATCH_SIZE
+      - AUGMENTATION
+      - IMAGE_SIZE
+      - LEARNING_RATE
+      - CLASSES
+    outs:
+      - artifacts/training
+
+  evaluation:
+    cmd: python src/Deep_learning_projects/pipeline/stage04_evalution_pipeline.py
+    deps:
+      - src/Deep_learning_projects/pipeline/stage04_evalution_pipeline.py
+      - src/Deep_learning_projects/components/model_evalution_mlflow.py
+      - config/config.yaml
+      - artifacts/data_ingestion
+      - artifacts/training/best.pt
+    params:
+      - IMAGE_SIZE
+      - BATCH_SIZE
+    metrics:
+      - scores.json:
+          cache: false

@@ -1,3 +1,20 @@
+ultralytics==8.3.54
+torch==2.5.1
+mlflow==2.20.0
+dagshub==0.5.2
+dvc==3.59.1
+dvc-data==3.16.9
+dvc-http==2.32.0
+gdown==5.2.0
+python-box==7.3.2
+ensure==1.0.4
+PyYAML==6.0.2
+joblib==1.4.2
+python-dotenv==1.1.1
+coloredlogs==15.0.1
+tqdm
+types-PyYAML
+fastapi==0.121.3
+uvicorn==0.38.0
+requests==2.32.5
 
-roboflow>=1.0.0
-python-dotenv>=1.0.0
