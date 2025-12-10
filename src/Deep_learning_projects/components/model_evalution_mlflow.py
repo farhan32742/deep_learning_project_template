@@ -25,7 +25,7 @@ class Evaluation:
             data=self.config.training_data,
             imgsz=self.config.params_image_size[0],
             batch=self.config.params_batch_size,
-            split='val' # Validates on the 'val' split defined in data.yaml
+            split='test' # Validates on the 'val' split defined in data.yaml
         )
 
         # 3. Extract Metrics

@@ -1,80 +1,81 @@
 import os
 import yaml
 import shutil
+import mlflow
 from pathlib import Path
-from dotenv import load_dotenv  # <--- NEW: Loads .env variables (URI, User, Password)
-from Deep_learning_projects.utils import log # <--- Using 'log' as you requested
+from dotenv import load_dotenv, find_dotenv
+from Deep_learning_projects.utils import log
 from ultralytics import YOLO
 from Deep_learning_projects.entity.config_entity import TrainingConfig
-from dotenv import load_dotenv
-# Load environment variables from .env file immediately
-load_dotenv()
+
+# 1. Force load .env
+load_dotenv(find_dotenv())
 
 class Training:
     def __init__(self, config: TrainingConfig):
         self.config = config
         self.model = None
 
+        # 2. CREDENTIAL CLEANING (The Fix)
+        username = os.getenv("MLFLOW_TRACKING_USERNAME")
+        password = os.getenv("MLFLOW_TRACKING_PASSWORD")
+        uri = os.getenv("MLFLOW_TRACKING_URI")
+
+        if password:
+            # Aggressively remove quotes and whitespace
+            clean_password = password.strip().replace('"', '').replace("'", '')
+            
+            # Update the environment variable with the clean version
+            os.environ["MLFLOW_TRACKING_PASSWORD"] = clean_password
+            
+            log.info(f"Credentials loaded for user: {username}")
+            log.info(f"Original Password Length: {len(password)}")
+            log.info(f"Cleaned Password Length:  {len(clean_password)}")
+            
+            # 3. Explicitly set MLflow configuration
+            mlflow.set_tracking_uri(uri)
+        else:
+            log.info("MLFLOW_TRACKING_PASSWORD is missing from .env")
+
     def get_base_model(self):
-        """
-        Loads the YOLO model (yolov8n.pt) prepared in the previous stage.
-        """
         self.model = YOLO(self.config.updated_base_model_path)
 
     def update_data_yaml_paths(self):
-        """
-        Rewrites 'train', 'val', and 'test' paths in data.yaml 
-        to absolute paths on the current machine.
-        """
         data_yaml_path = self.config.training_data
         
-        # 1. Read the existing YAML
         with open(data_yaml_path, 'r') as f:
             data = yaml.safe_load(f)
 
-        # 2. Get the root directory where data.yaml is located
         dataset_root = os.path.dirname(data_yaml_path)
 
-        # 3. Update paths to be Absolute Paths
         data['train'] = os.path.abspath(os.path.join(dataset_root, 'train'))
         data['val'] = os.path.abspath(os.path.join(dataset_root, 'valid')) 
         
-        # Check for 'val' vs 'valid' naming convention
         if not os.path.exists(data['val']):
             val_path_alternative = os.path.abspath(os.path.join(dataset_root, 'val'))
             if os.path.exists(val_path_alternative):
                 data['val'] = val_path_alternative
 
-        # Handle Test set
         test_path = os.path.join(dataset_root, 'test')
         if os.path.exists(test_path):
             data['test'] = os.path.abspath(test_path)
         else:
-            # Fallback to val if test doesn't exist
             data['test'] = data['val'] 
 
-        # 4. Enforce class count from params.yaml
         data['nc'] = self.config.params_classes
 
-        # 5. Write back to data.yaml
         with open(data_yaml_path, 'w') as f:
             yaml.dump(data, f)
             
         log.info(f"Updated data.yaml paths to absolute paths at: {dataset_root}")
 
     def train(self):
-        """
-        Executes YOLO training with MLflow logging enabled.
-        """
-        # 1. Fix the paths in data.yaml
         self.update_data_yaml_paths()
 
-        # 2. Define output directory
-        project_dir = self.config.root_dir # artifacts/training
+        project_dir = self.config.root_dir 
         run_name = "yolo_run"
 
-        # 3. Train the model
-        # YOLO will automatically detect the MLFLOW variables loaded by load_dotenv()
+        # YOLO will now use the CLEANED password from os.environ
         self.model.train(
             data=self.config.training_data,
             epochs=self.config.params_epochs,
@@ -87,7 +88,6 @@ class Training:
             augment=self.config.params_is_augmentation 
         )
 
-        # 4. Copy the best model to the simplified path
         generated_weight_path = os.path.join(project_dir, run_name, "weights", "best.pt")
         
         if os.path.exists(generated_weight_path):

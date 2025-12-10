@@ -19,3 +19,8 @@ training:
   root_dir: artifacts/training
   trained_model_path: artifacts/training/best.pt
   training_data: artifacts/data_ingestion/data.yaml
+
+evaluation:
+  root_dir: artifacts/evaluation
+  path_of_model: artifacts/training/best.pt
+  training_data: artifacts/data_ingestion/data.yaml
