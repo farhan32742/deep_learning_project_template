@@ -1,10 +1,12 @@
 from Deep_learning_projects.entity.config_entity import (DataIngestionConfig,
                                                          PrepareBaseModelConfig,
-                                                         TrainingConfig)
+                                                         TrainingConfig,
+                                                         EvaluationConfig)
 from pathlib import Path
 import os
 from Deep_learning_projects.utils.common import read_yaml, create_directories,save_json
 from Deep_learning_projects.constants import *
+from Deep_learning_projects.utils import log
 
 
 class ConfigurationManager:
@@ -80,3 +82,27 @@ class ConfigurationManager:
         )
 
         return training_config
+
+
+    def get_evaluation_config(self) -> EvaluationConfig:
+        # 1. Load the evaluation config section we just created in YAML
+        eval_config = self.config.evaluation
+        
+        # 2. Get params
+        params = self.params
+        create_directories([eval_config.root_dir])
+        log.info("checking mlflow uri from env variable")
+        mlflow_uri = os.environ.get("MLFLOW_TRACKING_URI")
+        log.info(f"mlflow uri: {mlflow_uri}")
+
+        # 5. Create the Entity
+        evaluation_config = EvaluationConfig(
+            path_of_model=Path(eval_config.path_of_model),
+            training_data=Path(eval_config.training_data),
+            mlflow_uri=mlflow_uri,
+            all_params=params,
+            params_image_size=params.IMAGE_SIZE,
+            params_batch_size=params.BATCH_SIZE
+        )
+        
+        return evaluation_config

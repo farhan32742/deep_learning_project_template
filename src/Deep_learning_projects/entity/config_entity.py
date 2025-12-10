@@ -32,3 +32,13 @@ class TrainingConfig:
     params_image_size: list
     params_classes: int         # <--- ADDED: To validate dataset against params.yaml
     params_learning_rate: float
+
+
+@dataclass(frozen=True)
+class EvaluationConfig:
+    path_of_model: Path       # Path to artifacts/training/best.pt
+    training_data: Path       # Path to data.yaml
+    all_params: dict          # param.yaml content
+    mlflow_uri: str           # MLflow tracking URI
+    params_image_size: list   # [640, 640, 3]
+    params_batch_size: int 
