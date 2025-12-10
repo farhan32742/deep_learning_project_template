@@ -67,39 +67,6 @@ class DataIngestion:
             zip_ref.extractall(unzip_path)
         log.info(f"Extracted zip file to {unzip_path}")
 
-    def save_data_splits_to_yaml(
-    train_dir: Path, test_dir: Path, valid_dir: Path, dest_path: Optional[Path] = None
-    ) -> Path:
-
-        try:
-            train_p = Path(train_dir)
-            test_p = Path(test_dir)
-            valid_p = Path(valid_dir)
-
-            if dest_path is None:
-                repo_root = Path(__file__).resolve().parents[3]
-                artifacts_dir = repo_root / "artifacts"
-                artifacts_dir.mkdir(parents=True, exist_ok=True)
-                dest_path = artifacts_dir / "data.yaml"
-            else:
-                dest_path = Path(dest_path)
-                dest_path.parent.mkdir(parents=True, exist_ok=True)
-
-            data = {
-                "train": str(train_p),
-                "test": str(test_p),
-                "valid": str(valid_p),
-            }
-
-            with open(dest_path, "w", encoding="utf-8") as f:
-                yaml.safe_dump(data, f)
-
-            log.info(f"Saved data splits to YAML: {dest_path}")
-            return dest_path
-
-        except Exception as e:
-            log.error(f"Failed to save data splits to YAML: {e}")
-            raise
 
 
 

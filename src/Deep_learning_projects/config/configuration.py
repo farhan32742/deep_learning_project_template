@@ -1,5 +1,6 @@
 from Deep_learning_projects.entity.config_entity import (DataIngestionConfig,
-                                                         PrepareBaseModelConfig)
+                                                         PrepareBaseModelConfig,
+                                                         TrainingConfig)
 from pathlib import Path
 import os
 from Deep_learning_projects.utils.common import read_yaml, create_directories,save_json
@@ -49,3 +50,33 @@ class ConfigurationManager:
         )
 
         return prepare_base_model_config
+    
+
+    def get_training_config(self) -> TrainingConfig:
+        training = self.config.training
+        prepare_base_model = self.config.prepare_base_model
+        params = self.params
+        
+        # YOLO specific: We need the path to 'data.yaml', not just the folder.
+        # We take this directly from the updated config.yaml
+        training_data = training.training_data 
+
+        create_directories([
+            Path(training.root_dir)
+        ])
+
+        training_config = TrainingConfig(
+            root_dir=Path(training.root_dir),
+            trained_model_path=Path(training.trained_model_path),
+            updated_base_model_path=Path(prepare_base_model.updated_base_model_path),
+            training_data=Path(training_data),
+            params_epochs=params.EPOCHS,
+            params_batch_size=params.BATCH_SIZE,
+            params_is_augmentation=params.AUGMENTATION,
+            params_image_size=params.IMAGE_SIZE,
+            # Added these two to match your updated entity_config.py
+            params_classes=params.CLASSES,
+            params_learning_rate=params.LEARNING_RATE
+        )
+
+        return training_config
