@@ -77,12 +77,12 @@ class Training:
 
         # YOLO will now use the CLEANED password from os.environ
         self.model.train(
-            data=self.config.training_data,
+            data=str(self.config.training_data),
             epochs=self.config.params_epochs,
             batch=self.config.params_batch_size,
             imgsz=self.config.params_image_size[0], 
             lr0=self.config.params_learning_rate,
-            project=project_dir,
+            project=str(project_dir),
             name=run_name,
             exist_ok=True, 
             augment=self.config.params_is_augmentation 
