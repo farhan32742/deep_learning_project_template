@@ -97,7 +97,7 @@ stages:
       nfiles: 211
     - path: artifacts/training/best.pt
       hash: md5
-      md5: 905fddffdd1e864ed023a8440e5736ae
+      md5: a475824e91b07553ab8b0c950a21d2c2
       size: 6242019
     - path: config/config.yaml
       hash: md5
