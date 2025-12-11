@@ -16,14 +16,7 @@ class ModelTrainingPipeline:
         config = ConfigurationManager()
         training_config = config.get_training_config()
         training = Training(config=training_config)
-        
-        # 1. Load the pre-trained weights (yolov8n.pt)
         training.get_base_model()
-        
-        # 2. REMOVED: training.train_valid_generator() 
-        # YOLO does not use Keras generators. It reads directly from data.yaml during train().
-        
-        # 3. Start Training (Includes updating data.yaml paths internally)
         training.train()
 
 
@@ -34,9 +27,9 @@ if __name__ == '__main__':
         
         # Debug Check for DVC
         if not os.getenv("MLFLOW_TRACKING_PASSWORD"):
-            log.warning("⚠️  DVC Warning: MLFLOW_TRACKING_PASSWORD not found in environment!")
+            log.warning("DVC Warning: MLFLOW_TRACKING_PASSWORD not found in environment!")
         else:
-            log.info("✅ DVC successfully loaded .env credentials.")
+            log.info("DVC successfully loaded .env credentials.")
 
         obj = ModelTrainingPipeline()
         obj.main()

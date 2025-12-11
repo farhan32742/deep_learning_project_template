@@ -12,7 +12,8 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/farhan32742/deep_learning_project_template",
-    packages=find_packages(),
+    package_dir={"": "src"},
+    packages=find_packages(where="src"),
     classifiers=[
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.8",
@@ -29,7 +30,7 @@ setup(
     ],
     python_requires=">=3.8",
     install_requires=[
-        "numpy>=1.21.0",
+        "numpy<2.0.0",
         "pandas>=1.3.0",
         "tensorflow>=2.10.0",
         "scikit-learn>=1.0.0",
@@ -40,6 +41,7 @@ setup(
         "python-dotenv>=0.19.0",
         "tqdm>=4.62.0",
         "requests>=2.26.0",
+        "ultralytics"
     ],
     extras_require={
         "dev": [

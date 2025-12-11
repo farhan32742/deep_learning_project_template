@@ -17,4 +17,5 @@ types-PyYAML
 fastapi==0.121.3
 uvicorn==0.38.0
 requests==2.32.5
-
+numpy<2.0.0
+-e .

@@ -68,8 +68,8 @@ stages:
       size: 3649
     - path: src/Deep_learning_projects/pipeline/stage03_model_training_pipeline.py
       hash: md5
-      md5: b299949c97460da3f14e15b0eb1f5c53
-      size: 1583
+      md5: 2c730b6c84e636a1ee9e8def55c9ca3a
+      size: 1256
     params:
       params.yaml:
         AUGMENTATION: true
@@ -84,7 +84,7 @@ stages:
     outs:
     - path: artifacts/training
       hash: md5
-      md5: 7755508c2dd18ff69193bcbb6cb79f8b.dir
+      md5: 11369921ed79ee6ba0f9f1cdab2ab81e.dir
       size: 23702440
       nfiles: 20
   evaluation:
@@ -97,7 +97,7 @@ stages:
       nfiles: 211
     - path: artifacts/training/best.pt
       hash: md5
-      md5: 6c0b9fe3ee3dda0823c61165cf5c271f
+      md5: 905fddffdd1e864ed023a8440e5736ae
       size: 6242019
     - path: config/config.yaml
       hash: md5
