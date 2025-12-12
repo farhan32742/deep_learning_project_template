@@ -2,9 +2,15 @@ venv/
 env/
 shared_enviroment/
 artifacts/
+runs/
+logs/
+.git/
+.github/
 __pycache__/
 *.pyc
 .pytest_cache/
 .DS_Store
-.git/
 .env
+.env.example
+dvc.lock
+dvc.yaml
