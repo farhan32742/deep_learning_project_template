@@ -50,5 +50,4 @@ async def predict_route(file: UploadFile = File(...)):
         return JSONResponse(content={"error": str(e)}, status_code=500)
 
 if __name__ == "__main__":
-    # Host 0.0.0.0 allows external access if needed, port 8080 is standard
     uvicorn.run(app, host="0.0.0.0", port=8080)
