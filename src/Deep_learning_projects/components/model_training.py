@@ -62,7 +62,7 @@ class Training:
         else:
             data['test'] = data['val'] 
 
-        data['nc'] = self.config.params_classes
+        # data['nc'] = self.config.params_classes
 
         with open(data_yaml_path, 'w') as f:
             yaml.dump(data, f)

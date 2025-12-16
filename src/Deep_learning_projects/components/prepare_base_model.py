@@ -30,7 +30,10 @@ class PrepareBaseModel:
             _ = YOLO(self.config.model_name)  # e.g., 'yolov8n.pt'
 
             # Ultralytics saves model as '<model_name>.pt' in cwd
-            source_path = Path(f"{self.config.model_name}.pt")
+            if self.config.model_name.endswith(".pt"):
+                source_path = Path(self.config.model_name)
+            else:
+                source_path = Path(f"{self.config.model_name}.pt")
 
             # Move/Copy the file to artifacts folder
             if source_path.exists():

@@ -1,26 +1,19 @@
 artifacts_root: artifacts
-
-
 data_ingestion:
+  local_data_file: artifacts/data_ingestion/data.zip
   root_dir: artifacts/data_ingestion
   source_URL: https://drive.google.com/file/d/12FeWb_KqhTW1t_6Fxi5inmHwOCmhrZC9/view?usp=sharing
-  local_data_file: artifacts/data_ingestion/data.zip
   unzip_dir: artifacts/data_ingestion
-
-
-prepare_base_model:
-  root_dir: artifacts/prepare_base_model
-  base_model_path: artifacts/prepare_base_model/yolo12n.pt 
-  updated_base_model_path: artifacts/prepare_base_model/best.pt 
-  model_name: yolo12n
-
-
-training:
-  root_dir: artifacts/training
-  trained_model_path: artifacts/training/best.pt
-  training_data: artifacts/data_ingestion/data.yaml
-
 evaluation:
+  path_of_model: artifacts/model_training/best.pt
   root_dir: artifacts/evaluation
-  path_of_model: artifacts/training/best.pt
+  training_data: artifacts/data_ingestion/data.yaml
+prepare_base_model:
+  base_model_path: artifacts/prepare_base_model\yolo12s.pt
+  model_name: yolo12s.pt
+  root_dir: artifacts/prepare_base_model
+  updated_base_model_path: artifacts/prepare_base_model/best.pt
+training:
+  root_dir: artifacts/model_training
+  trained_model_path: artifacts/model_training/best.pt
   training_data: artifacts/data_ingestion/data.yaml

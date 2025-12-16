@@ -26,8 +26,8 @@ class DataIngestion:
             zip_download_path = Path(self.config.local_data_file)
             unzip_path = Path(self.config.unzip_dir)
 
-            # If extracted data already exists, skip download and extraction
-            if unzip_path.exists() and any(unzip_path.iterdir()):
+            # If extracted data already exists (checking key file 'data.yaml'), skip download and extraction
+            if (unzip_path / "data.yaml").exists():
                 log.info(f"Data already present at {unzip_path}. Skipping download.")
                 return str(unzip_path)
 
