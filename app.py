@@ -4,6 +4,7 @@ import uvicorn
 import os
 import shutil
 from Deep_learning_projects.utils import log
+import ultralytics
 from Deep_learning_projects.pipeline.prediction_pipeline import PredictionPipeline
 
 app = FastAPI()
