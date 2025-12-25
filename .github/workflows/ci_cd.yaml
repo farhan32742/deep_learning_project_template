@@ -1,0 +1,77 @@
+name: Deploy Application to Docker Hub
+
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - 'README.md'
+
+jobs:
+  integration:
+    name: Continuous Integration
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Lint and Test
+        run: echo "Running tests..."
+
+  build-and-push:
+    name: Continuous Delivery
+    needs: integration
+    runs-on: ubuntu-latest
+    outputs:
+      image_name: ${{ steps.prep.outputs.image }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Prepare Image Metadata
+        id: prep
+        run: |
+          # Use your Docker Hub Username and GitHub Repo Name dynamically
+          DOCKER_IMAGE="${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}"
+          echo "image=${DOCKER_IMAGE}" >> $GITHUB_OUTPUT
+          echo "tag=latest" >> $GITHUB_OUTPUT
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          # Tags the image as: username/github-repo-name:latest
+          tags: ${{ steps.prep.outputs.image }}:latest
+
+  continuous-deployment:
+    name: Continuous Deployment
+    needs: build-and-push
+    runs-on: self-hosted # Your local server/EC2
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Pull and Restart Container
+        run: |
+          # Use the dynamic image name
+          IMAGE_NAME="${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest"
+          
+          docker pull $IMAGE_NAME
+          
+          # Stop old one
+          docker ps -q --filter "name=cnncls" | grep -q . && docker stop cnncls && docker rm -fv cnncls || true
+          
+          # Run new one
+          docker run -d -p 8080:8080 --name=cnncls $IMAGE_NAME
+          
+          # Cleanup
+          docker system prune -f

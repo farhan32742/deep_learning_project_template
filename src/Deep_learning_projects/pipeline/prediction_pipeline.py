@@ -7,7 +7,7 @@ class PredictionPipeline:
     def __init__(self):
         # Hardcoding the model path as per user instruction "my best.pt is on the model folder"
         # In a more robust setup, this could be in config.yaml
-        self.model_path = os.path.join("model", "best.pt")
+        self.model_path = os.path.join("model", "best(1).pt")
         
         if not os.path.exists(self.model_path):
              # Fallback or error if model doesn't exist. 
