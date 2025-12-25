@@ -1,4 +1,4 @@
-name: Local Machine Deploy
+name: Local Machine Multi-Server Deploy
 
 on:
   push:
@@ -25,7 +25,12 @@ jobs:
     needs: build
     runs-on: [self-hosted, testing-server]
     steps:
+      - name: Login to Docker Hub locally
+        shell: powershell
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
       - name: Deploy to Test (Port 9090)
+        shell: powershell
         run: |
           docker pull ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
           if (docker ps -aq --filter "name=test-app") { docker stop test-app; docker rm test-app }
@@ -36,7 +41,12 @@ jobs:
     environment: production
     runs-on: [self-hosted, prod-server]
     steps:
+      - name: Login to Docker Hub locally
+        shell: powershell
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
       - name: Deploy to Prod (Port 8080)
+        shell: powershell
         run: |
           docker pull ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
           if (docker ps -aq --filter "name=prod-app") { docker stop prod-app; docker rm prod-app }
