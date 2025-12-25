@@ -2,52 +2,73 @@ name: Local Machine Multi-Server Deploy
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master ] # Agar aapki main branch ka naam 'main' hai toh yahan change karlein
 
 jobs:
+  # 1. Build Job: Docker Hub par image push karega
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Login to Docker Hub
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Login to Docker Hub (Cloud)
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Build and Push
+
+      - name: Build and Push Image
         uses: docker/build-push-action@v4
         with:
           context: .
           push: true
+          # Image ka naam: username/repository-name:latest
           tags: ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
 
+  # 2. Deploy to Testing: Aapke 'testing-server' runner par chalega (Port 9090)
   deploy-test:
     needs: build
     runs-on: [self-hosted, testing-server]
     steps:
-      - name: Login to Docker Hub locally
-        shell: powershell
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-
-      - name: Deploy to Test (Port 9090)
+      - name: Pull and Run on Test Server
         shell: powershell
         run: |
+          # Image pull karna
           docker pull ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
-          if (docker ps -aq --filter "name=test-app") { docker stop test-app; docker rm test-app }
+          
+          # Agar purana container chal raha hai toh usay khatam karna
+          if (docker ps -aq --filter "name=test-app") { 
+              docker stop test-app
+              docker rm test-app 
+          }
+          
+          # Naya container Port 9090 par chalana
           docker run -d --name test-app -p 9090:8080 ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
+          
+          # Purani unused images delete karna taake space bache
+          docker image prune -f
 
+  # 3. Deploy to Production: Approval ke baad 'prod-server' runner par chalega (Port 8080)
   deploy-prod:
     needs: deploy-test
-    environment: production
+    environment: production # Is line ki wajah se GitHub aapse Approval mangay ga
     runs-on: [self-hosted, prod-server]
     steps:
-      - name: Login to Docker Hub locally
-        shell: powershell
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-
-      - name: Deploy to Prod (Port 8080)
+      - name: Pull and Run on Production Server
         shell: powershell
         run: |
+          # Image pull karna
           docker pull ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
-          if (docker ps -aq --filter "name=prod-app") { docker stop prod-app; docker rm prod-app }
+          
+          # Agar purana container chal raha hai toh usay khatam karna
+          if (docker ps -aq --filter "name=prod-app") { 
+              docker stop prod-app
+              docker rm prod-app 
+          }
+          
+          # Naya container Port 8080 par chalana
           docker run -d --name prod-app -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
+          
+          # Cleanup
+          docker image prune -f
